@@ -225,23 +225,23 @@ router.put("/change-password", verifyToken, async (req, res) => {
 router.delete("/delete/:id", verifyToken, async (req, res) => {
   try {
     const id = req.params.id;
-
+    
     //delete all user videos;
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate('videos');
 
     if (user) {
       let TotalVideos = user.videos;
       if (TotalVideos) {
         for (let i = 0; i < TotalVideos.length; i++) {
-          const video = await Video.findById(TotalVideos[i]);
-
+          const video = TotalVideos[i];
           //delete video from cloud
           if(video.cloudinary_id){
+            
             await cloudinary.uploader.destroy(
               video.cloudinary_id,
               (err, info) => {
                 if (err) {
-                  return console.log(err.message);
+                 return console.log(err.message);
                 } else {
                   return console.log("profile image deleted");
                 }
@@ -249,7 +249,6 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
             );
           }
           //delete video from database
-          console.log("id", TotalVideos[i]);
           await Video.findByIdAndDelete(TotalVideos[i]);
         }
       }
@@ -269,7 +268,7 @@ if(user.cloudinary_id){
     const deleteUser = await User.findByIdAndDelete(req.params.id);
     res.status(201).send({ msg: "account deleted SuccessFully" });
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
   }
 });
 
