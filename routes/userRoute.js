@@ -236,17 +236,18 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
           const video = await Video.findById(TotalVideos[i]);
 
           //delete video from cloud
-          console.log(video.cloudinary_id);
-          await cloudinary.uploader.destroy(
-            video.cloudinary_id,
-            (err, info) => {
-              if (err) {
-                return console.log(err.message);
-              } else {
-                return console.log("profile image deleted");
+          if(video.cloudinary_id){
+            await cloudinary.uploader.destroy(
+              video.cloudinary_id,
+              (err, info) => {
+                if (err) {
+                  return console.log(err.message);
+                } else {
+                  return console.log("profile image deleted");
+                }
               }
-            }
-          );
+            );
+          }
           //delete video from database
           console.log("id", TotalVideos[i]);
           await Video.findByIdAndDelete(TotalVideos[i]);
